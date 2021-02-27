@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:topapp/repository/confirm_login_repo.dart';
 import 'package:topapp/repository/register_repo.dart';
 import 'package:topapp/widgets/countDown.dart';
 
@@ -13,6 +15,7 @@ class ConfirmLogin extends StatefulWidget {
   _ConfirmLoginState createState() => _ConfirmLoginState();
 }
 
+ConfirmLoginRepo _confirmLoginRepo;
 RegisterRepository _registerRepository;
 
 GlobalKey<State> _keyLoader = new GlobalKey<State>();
@@ -44,12 +47,15 @@ class _ConfirmLoginState extends State<ConfirmLogin>
     _controller = AnimationController(
         vsync: this, duration: Duration(seconds: levelClock));
 
+    _confirmLoginRepo = ConfirmLoginRepo();
     _registerRepository = RegisterRepository();
+
     _controller.forward();
   }
 
   @override
   Widget build(BuildContext context) {
+    print(context);
     final routeArgs =
         ModalRoute.of(context).settings.arguments as Map<String, String>;
     final flowToken = routeArgs['flowToken'];
@@ -185,7 +191,14 @@ class _ConfirmLoginState extends State<ConfirmLogin>
   }
 }
 
-confirmLogin(BuildContext context) {}
+confirmLogin(BuildContext context) async {
+  print(context);
+  var registerRes = await _confirmLoginRepo.getConfirmLogin(pin.text, 'pi');
+  if (registerRes.Token.isNotEmpty) {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', registerRes.Token);
+  }
+}
 
 reSendCode(BuildContext context) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
