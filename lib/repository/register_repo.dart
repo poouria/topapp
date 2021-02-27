@@ -1,19 +1,23 @@
 import 'dart:convert';
 
-import 'package:topapp/models/register.dart';
+import 'package:topapp/models/registerModel.dart';
+import 'package:topapp/models/responseCoreModel.dart';
 import 'package:topapp/networking/api_base_helper.dart';
 
 class RegisterRepository {
   ApiBaseHelper _helper = ApiBaseHelper();
 
-  Future<List<Register>> fetchRegister() async {
+  Future<RegisterModel> fetchRegister(mobileNo) async {
     final response = await _helper.post(
         "party/register",
         jsonEncode({
           'MarketId': 80,
-          'MobileNo': '09120476510',
+          'MobileNo': mobileNo,
         }));
-    print(response);
-    return RegisterResponse.fromJson(response).Data;
+    var responseCore = ResponseCoreModel.fromJson(response);
+    var result = jsonDecode(responseCore.DataString);
+    result["ResponseCoreMessage"] = responseCore.Message;
+
+    return RegisterModel.fromJson(result);
   }
 }

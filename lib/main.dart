@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:topapp/screens/confirmLogin.dart';
 import 'package:topapp/screens/login.dart';
 import 'package:topapp/utils/theme/app_theme.dart';
 import 'package:topapp/utils/theme_notifier.dart';
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => Login(),
+        '/confirmLogin': (context) => ConfirmLogin()
       },
     );
   }

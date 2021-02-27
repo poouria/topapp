@@ -26,21 +26,19 @@ final ThemeData lightTheme = ThemeData(
   unselectedWidgetColor: Color(0x8a000000),
   disabledColor: Color(0x61000000),
   buttonColor: Color(0xfffe5000),
-  toggleableActiveColor: Color(0xff804c80),
+  toggleableActiveColor: Color(0xfffe5000),
   secondaryHeaderColor: Color(0xfff5eff5),
   textSelectionColor: Color(0xffd9bfd9),
   cursorColor: Color(0x8a000000),
-  textSelectionHandleColor: Color(0xffc69fc6),
+  textSelectionHandleColor: Color(0xfffe5000),
   backgroundColor: Color(0xffd9d9d6),
   dialogBackgroundColor: Color(0xffffffff),
-  indicatorColor: Color(0xff9f609f),
+  indicatorColor: Color(0xfffe5000),
   hintColor: Color(0x66c8c8c8),
   errorColor: Color(0xffd32f2f),
-  appBarTheme: AppBarTheme(
-    color: Color(0xffd9d9d6)
-  ),
+  appBarTheme: AppBarTheme(color: Color(0xffd9d9d6)),
   buttonTheme: ButtonThemeData(
-    textTheme: ButtonTextTheme.normal,
+    textTheme: ButtonTextTheme.accent,
     minWidth: 88,
     height: 36,
     padding: EdgeInsets.only(top: 0, bottom: 0, left: 16, right: 16),
@@ -61,9 +59,9 @@ final ThemeData lightTheme = ThemeData(
     hoverColor: Color(0x0a000000),
     colorScheme: ColorScheme(
       primary: Color(0xffd9d9d6),
-      primaryVariant: Color(0xff603960),
-      secondary: Color(0xff9f609f),
-      secondaryVariant: Color(0xff603960),
+      primaryVariant: Color(0xfffe5000),
+      secondary: Color(0xfffe5000),
+      secondaryVariant: Color(0xfffe5000),
       surface: Color(0xffffffff),
       background: Color(0xffd9d9d6),
       error: Color(0xffd32f2f),
@@ -497,14 +495,9 @@ final darkTheme = ThemeData(
   primaryColor: Colors.black,
   brightness: Brightness.dark,
   backgroundColor: const Color(0xFF171717),
-  scaffoldBackgroundColor:const Color(0xFF171717)
-
-  ,
+  scaffoldBackgroundColor: const Color(0xFF171717),
   accentColor: const Color(0xFF101820),
   accentIconTheme: IconThemeData(color: Colors.black),
-
-
-
   inputDecorationTheme: InputDecorationTheme(
     filled: true,
     fillColor: Colors.black54,
@@ -543,8 +536,6 @@ final darkTheme = ThemeData(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
   ),
-
-
   buttonTheme: ButtonThemeData(
     textTheme: ButtonTextTheme.normal,
     minWidth: 88,
@@ -567,9 +558,9 @@ final darkTheme = ThemeData(
     hoverColor: Color(0x0a000000),
     colorScheme: ColorScheme(
       primary: Color(0xfffcfafc),
-      primaryVariant: Color(0xff603960),
-      secondary: Color(0xff9f609f),
-      secondaryVariant: Color(0xff603960),
+      primaryVariant: Color(0xfffe5000),
+      secondary: Color(0xfffe5000),
+      secondaryVariant: Color(0xfffe5000),
       surface: Color(0xffffffff),
       background: Color(0xffd9bfd9),
       error: Color(0xffd32f2f),

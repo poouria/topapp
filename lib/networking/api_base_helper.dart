@@ -38,35 +38,6 @@ class ApiBaseHelper {
     print('api post.');
     return responseJson;
   }
-
-  Future<dynamic> put(String url, dynamic body) async {
-    print('Api Put, url $url');
-    var responseJson;
-    try {
-      final response = await http.put(_baseUrl + url, body: body);
-      responseJson = _returnResponse(response);
-    } on SocketException {
-      print('No net');
-      throw FetchDataException('No Internet connection');
-    }
-    print('api put.');
-    print(responseJson.toString());
-    return responseJson;
-  }
-
-  Future<dynamic> delete(String url) async {
-    print('Api delete, url $url');
-    var apiResponse;
-    try {
-      final response = await http.delete(_baseUrl + url);
-      apiResponse = _returnResponse(response);
-    } on SocketException {
-      print('No net');
-      throw FetchDataException('No Internet connection');
-    }
-    print('api delete.');
-    return apiResponse;
-  }
 }
 
 dynamic _returnResponse(http.Response response) {
@@ -75,7 +46,6 @@ dynamic _returnResponse(http.Response response) {
       if (response.body.isEmpty) {
         throw FetchDataException('Empty Response');
       }
-
       var responseJson = json.decode(response.body.toString());
       return responseJson;
 
