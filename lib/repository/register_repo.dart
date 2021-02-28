@@ -7,7 +7,7 @@ import 'package:topapp/networking/api_base_helper.dart';
 class RegisterRepository {
   ApiBaseHelper _helper = ApiBaseHelper();
 
-  Future<RegisterModel> fetchRegister(mobileNo) async {
+  Future<RegisterModel> fetchRegister(String mobileNo) async {
     final response = await _helper.post(
         "party/register",
         jsonEncode({

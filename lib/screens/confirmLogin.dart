@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:topapp/blocs/register_bloc.dart';
 import 'package:topapp/repository/confirm_login_repo.dart';
-import 'package:topapp/repository/register_repo.dart';
-import 'package:topapp/widgets/countDown.dart';
 
 class ConfirmLogin extends StatefulWidget {
   static const routeName = '/confirmLogin';
@@ -15,47 +13,51 @@ class ConfirmLogin extends StatefulWidget {
   _ConfirmLoginState createState() => _ConfirmLoginState();
 }
 
-ConfirmLoginRepo _confirmLoginRepo;
-RegisterRepository _registerRepository;
+class _ConfirmLoginState extends State<ConfirmLogin> {
+  ConfirmLoginRepo _confirmLoginRepo;
+  RegisterBloc _registerBloc;
 
-GlobalKey<State> _keyLoader = new GlobalKey<State>();
-final _formKey = new GlobalKey<FormState>();
-final pin = new TextEditingController();
+  final _formKey = new GlobalKey<FormState>();
+  final pin = new TextEditingController();
 
-class _ConfirmLoginState extends State<ConfirmLogin>
-    with TickerProviderStateMixin {
-  AnimationController _controller;
-  int levelClock = 300;
-  bool showResend = false;
+  Timer _timer;
+  int _start = 10;
 
-  void resetClock() {
-    setState(() {
-      levelClock = 300;
-    });
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(
+      oneSec,
+      (Timer timer) {
+        if (_start == 0) {
+          setState(() {
+            timer.cancel();
+          });
+        } else {
+          setState(() {
+            _start--;
+          });
+        }
+      },
+    );
   }
 
   @override
   void dispose() {
     pin.dispose();
-    _controller.dispose();
+    _timer.cancel();
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-        vsync: this, duration: Duration(seconds: levelClock));
-
     _confirmLoginRepo = ConfirmLoginRepo();
-    _registerRepository = RegisterRepository();
-
-    _controller.forward();
+    _registerBloc = RegisterBloc();
+    startTimer();
   }
 
   @override
   Widget build(BuildContext context) {
-    print(context);
     final routeArgs =
         ModalRoute.of(context).settings.arguments as Map<String, String>;
     final flowToken = routeArgs['flowToken'];
@@ -132,7 +134,7 @@ class _ConfirmLoginState extends State<ConfirmLogin>
                             elevation: 0,
                             onPressed: () async => {
                               if (_formKey.currentState.validate())
-                                {confirmLogin(context)}
+                                {confirmLogin(context, flowToken)}
                             },
                           ),
                         ),
@@ -154,12 +156,7 @@ class _ConfirmLoginState extends State<ConfirmLogin>
                   Container(
                       padding: EdgeInsets.only(top: 10.0),
                       child: Text('منتظر دریافت کد فعالسازی')),
-                  Countdown(
-                    animation: StepTween(
-                      begin: levelClock,
-                      end: 0,
-                    ).animate(_controller),
-                  ),
+                  Text("$_start"),
                   Container(
                     padding: EdgeInsets.only(top: 10.0),
                     child: FlatButton(
@@ -167,13 +164,6 @@ class _ConfirmLoginState extends State<ConfirmLogin>
                       highlightColor: Colors.transparent,
                       onPressed: () => {
                         reSendCode(context),
-                        resetClock(),
-                        _controller = AnimationController(
-                            vsync: this,
-                            duration: Duration(seconds: levelClock)),
-                        _controller.forward(),
-                        print(_controller),
-                        showResend = false
                       },
                       child: Directionality(
                         textDirection: TextDirection.rtl,
@@ -189,18 +179,18 @@ class _ConfirmLoginState extends State<ConfirmLogin>
       ),
     );
   }
-}
 
-confirmLogin(BuildContext context) async {
-  print(context);
-  var registerRes = await _confirmLoginRepo.getConfirmLogin(pin.text, 'pi');
-  if (registerRes.Token.isNotEmpty) {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('token', registerRes.Token);
+  confirmLogin(BuildContext context, String flowToken) async {
+    var registerRes =
+        await _confirmLoginRepo.getConfirmLogin(pin.text, flowToken);
+    if (registerRes.Token.isNotEmpty) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', registerRes.Token);
+    }
   }
-}
 
-reSendCode(BuildContext context) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  await _registerRepository.fetchRegister(prefs.getString('mobileNo'));
+  reSendCode(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await _registerBloc.fetchRegister(prefs.getString('mobileNo'));
+  }
 }

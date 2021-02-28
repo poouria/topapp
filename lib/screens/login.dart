@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:topapp/repository/register_repo.dart';
+import 'package:topapp/blocs/register_bloc.dart';
+import 'package:topapp/models/registerModel.dart';
+import 'package:topapp/networking/api_response.dart';
 import 'package:topapp/screens/confirmLogin.dart';
 
 class Login extends StatefulWidget {
@@ -9,11 +11,10 @@ class Login extends StatefulWidget {
   _LoginState createState() => _LoginState();
 }
 
-final _formKey = GlobalKey<FormState>();
-RegisterRepository _registerRepository;
-final mobileNo = TextEditingController();
-
 class _LoginState extends State<Login> {
+  final _formKey = GlobalKey<FormState>();
+  RegisterBloc _registerBloc;
+  final mobileNo = TextEditingController();
   @override
   void dispose() {
     mobileNo.dispose();
@@ -23,7 +24,7 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    _registerRepository = RegisterRepository();
+    _registerBloc = RegisterBloc();
   }
 
   @override
@@ -86,7 +87,8 @@ class _LoginState extends State<Login> {
                         ),
                         elevation: 0,
                         onPressed: () async => {
-                          if (_formKey.currentState.validate()) {login(context)}
+                          if (_formKey.currentState.validate())
+                            {_registerBloc.fetchRegister(mobileNo.text)}
                         },
                       ),
                     ),
@@ -94,21 +96,41 @@ class _LoginState extends State<Login> {
                 ])
               ]),
             ),
+            StreamBuilder<ApiResponse<RegisterModel>>(
+              stream: _registerBloc.registerStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  switch (snapshot.data.status) {
+                    case Status.LOADING:
+                      return Container(
+                          child: Text(snapshot.data.message.toString()));
+                      break;
+                    case Status.COMPLETED:
+                      login(context, snapshot.data.data);
+                      break;
+                    case Status.ERROR:
+                      return Container(
+                          child: Text(snapshot.data.message.toString()));
+                      break;
+                  }
+                }
+                return Container();
+              },
+            ),
           ]),
         ),
       ),
     );
   }
-}
 
-login(BuildContext context) async {
-  var registerRes = await _registerRepository.fetchRegister(mobileNo.text);
-  if (registerRes.FlowToken.isNotEmpty) {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('mobileNo', mobileNo.text);
-    Navigator.of(context).pushNamed(ConfirmLogin.routeName, arguments: {
-      'flowToken': registerRes.FlowToken,
-      'registerMessage': registerRes.ResponseCoreMessage
-    });
+  login(BuildContext context, data) async {
+    if (data.FlowToken.isNotEmpty) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('mobileNo', mobileNo.text);
+      Navigator.of(context).pushNamed(ConfirmLogin.routeName, arguments: {
+        'flowToken': data.FlowToken.toString(),
+        'registerMessage': data.ResponseCoreMessage.toString()
+      });
+    }
   }
 }
