@@ -9,7 +9,7 @@ class ConfirmLoginRepo {
 
   Future<ConfirmLoginModel> getConfirmLogin(pin, flowToken) async {
     final response = await _helper.post(
-      "party/register",
+      "party/Confirm",
       jsonEncode(
         {'Code': pin, 'ClientVersion': '1.0.7', 'FlowToken': flowToken},
       ),

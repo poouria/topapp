@@ -26,9 +26,9 @@ class MyApp extends StatelessWidget {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     return MaterialApp(
       theme: themeNotifier.getTheme(),
-      initialRoute: '/',
+      initialRoute: '/login',
       routes: {
-        '/': (context) => Login(),
+        '/login': (context) => Login(),
         '/confirmLogin': (context) => ConfirmLogin()
       },
     );

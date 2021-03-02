@@ -11,17 +11,18 @@ class AppException implements Exception {
 
 class FetchDataException extends AppException {
   FetchDataException([String message])
-      : super(message, "Error During Communication: ");
+      : super(message, "خطا در برقرراری ارتباط:");
 }
 
 class BadRequestException extends AppException {
-  BadRequestException([message]) : super(message, "Invalid Request: ");
+  BadRequestException([message]) : super(message, "درخواست نا معتبر است: ");
 }
 
 class UnauthorisedException extends AppException {
-  UnauthorisedException([message]) : super(message, "Unauthorised: ");
+  UnauthorisedException([message]) : super(message, "خطای دسترسی: ");
 }
 
 class InvalidInputException extends AppException {
-  InvalidInputException([String message]) : super(message, "Invalid Input: ");
+  InvalidInputException([String message])
+      : super(message, "ورودی نا معتبر است: ");
 }

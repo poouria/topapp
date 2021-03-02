@@ -15,6 +15,7 @@ ConfirmLoginModel _$ConfirmLoginModelFromJson(Map<String, dynamic> json) {
     json['Info'] as String,
     json['PublicKey'] as String,
     json['HasWallet'] as String,
+    json['ResponseCoreMessage'] as String,
   );
 }
 
@@ -27,4 +28,5 @@ Map<String, dynamic> _$ConfirmLoginModelToJson(ConfirmLoginModel instance) =>
       'Info': instance.Info,
       'PublicKey': instance.PublicKey,
       'HasWallet': instance.HasWallet,
+      'ResponseCoreMessage': instance.ResponseCoreMessage,
     };

@@ -16,8 +16,7 @@ class RegisterBloc {
       _registerResController.stream;
 
   RegisterBloc() {
-    _registerResController =
-        StreamController<ApiResponse<RegisterModel>>.broadcast();
+    _registerResController = StreamController<ApiResponse<RegisterModel>>();
     _registerRepository = RegisterRepository();
   }
 
@@ -28,7 +27,7 @@ class RegisterBloc {
           await _registerRepository.fetchRegister(mobileNo);
       registerResSink.add(ApiResponse.completed(register));
     } catch (e) {
-      registerResSink.add(ApiResponse.error('ressss'));
+      registerResSink.add(ApiResponse.error(e.toString()));
       print(e);
     }
   }

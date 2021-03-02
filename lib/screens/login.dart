@@ -5,19 +5,26 @@ import 'package:topapp/blocs/register_bloc.dart';
 import 'package:topapp/models/registerModel.dart';
 import 'package:topapp/networking/api_response.dart';
 import 'package:topapp/screens/confirmLogin.dart';
+import 'package:topapp/widgets/spinner.dart';
+import 'package:topapp/widgets/message_dialog.dart';
+import 'package:topapp/utils/string_helper.dart';
 
 class Login extends StatefulWidget {
+  static const routeName = '/login';
+
   @override
   _LoginState createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
+  GlobalKey<State> _keyLoader = new GlobalKey<State>();
   final _formKey = GlobalKey<FormState>();
   RegisterBloc _registerBloc;
   final mobileNo = TextEditingController();
   @override
   void dispose() {
     mobileNo.dispose();
+    _registerBloc.dispose();
     super.dispose();
   }
 
@@ -29,6 +36,11 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    final routeArgs =
+        ModalRoute.of(context).settings.arguments as Map<String, String>;
+    if (routeArgs != null) {
+      mobileNo.text = routeArgs['mobileNo'];
+    }
     return Scaffold(
       body: SafeArea(
         child: Form(
@@ -102,15 +114,43 @@ class _LoginState extends State<Login> {
                 if (snapshot.hasData) {
                   switch (snapshot.data.status) {
                     case Status.LOADING:
-                      return Container(
-                          child: Text(snapshot.data.message.toString()));
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        SpinnerDialog.showLoadingDialog(context, _keyLoader);
+                      });
+
                       break;
                     case Status.COMPLETED:
-                      login(context, snapshot.data.data);
+                      Navigator.of(_keyLoader.currentContext,
+                              rootNavigator: true)
+                          .pop();
+                      navigateToConfirm(context, snapshot.data.data);
                       break;
                     case Status.ERROR:
-                      return Container(
-                          child: Text(snapshot.data.message.toString()));
+
+                      // showing alert dialog before the completion of build method
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        MessageDialog.showMessageDialog(
+                          context,
+                          _keyLoader,
+                          StringHelper.splitter(snapshot.data.message, ':')[0]
+                              .toString(),
+                          StringHelper.splitter(snapshot.data.message, ':')[1]
+                              .toString(),
+                          [
+                            RaisedButton(
+                              elevation: 0,
+                              child: Text(
+                                'خب',
+                                style: TextStyle(
+                                    fontSize: 15.0, color: Colors.white),
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            )
+                          ],
+                        );
+                      });
                       break;
                   }
                 }
@@ -123,11 +163,12 @@ class _LoginState extends State<Login> {
     );
   }
 
-  login(BuildContext context, data) async {
+  navigateToConfirm(BuildContext context, data) async {
     if (data.FlowToken.isNotEmpty) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('mobileNo', mobileNo.text);
-      Navigator.of(context).pushNamed(ConfirmLogin.routeName, arguments: {
+      Navigator.of(context)
+          .pushReplacementNamed(ConfirmLogin.routeName, arguments: {
         'flowToken': data.FlowToken.toString(),
         'registerMessage': data.ResponseCoreMessage.toString()
       });

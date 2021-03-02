@@ -16,7 +16,8 @@ class ApiBaseHelper {
       responseJson = _returnResponse(response);
     } on SocketException {
       print('No net');
-      throw FetchDataException('No Internet connection');
+      throw FetchDataException(
+          'لطفا از متصل بودن اینترنت اطمینان حاصل فرمایید.');
     }
     print('api get recieved!');
     return responseJson;
@@ -33,7 +34,8 @@ class ApiBaseHelper {
       responseJson = _returnResponse(response);
     } on SocketException {
       print('No net');
-      throw FetchDataException('No Internet connection');
+      throw FetchDataException(
+          'لطفا از متصل بودن اینترنت اطمینان حاصل فرمایید.');
     }
     print('api post.');
     return responseJson;
@@ -44,7 +46,7 @@ dynamic _returnResponse(http.Response response) {
   switch (response.statusCode) {
     case 200:
       if (response.body.isEmpty) {
-        throw FetchDataException('Empty Response');
+        throw FetchDataException('پاسخ نامعتبر است');
       }
       var responseJson = json.decode(response.body.toString());
       return responseJson;
@@ -57,6 +59,6 @@ dynamic _returnResponse(http.Response response) {
     case 500:
     default:
       throw FetchDataException(
-          'Error occured while Communication with Server with StatusCode : ${response.statusCode}');
+          'خطا در برقراری ارتباط با سرور : ${response.statusCode}');
   }
 }

@@ -9,22 +9,25 @@ class MessageDialog {
       builder: (BuildContext context) {
         return new WillPopScope(
           onWillPop: () async => true,
-          child: AlertDialog(
-            title: Column(children: [
-              Icon(
-                Icons.error_outline,
-                size: 50.0,
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: AlertDialog(
+              title: Column(children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 50.0,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 10.0),
+                  child: Text(title),
+                )
+              ]),
+              content: Text(
+                content,
+                textAlign: TextAlign.center,
               ),
-              Padding(
-                padding: EdgeInsets.only(top: 10.0),
-                child: Text(title),
-              )
-            ]),
-            content: Text(
-              content,
-              textAlign: TextAlign.center,
+              actions: actions,
             ),
-            actions: actions,
           ),
         );
       },

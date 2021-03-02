@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:topapp/blocs/register_bloc.dart';
 import 'package:topapp/repository/confirm_login_repo.dart';
+import 'package:topapp/screens/login.dart';
 
 class ConfirmLogin extends StatefulWidget {
   static const routeName = '/confirmLogin';
@@ -21,9 +22,11 @@ class _ConfirmLoginState extends State<ConfirmLogin> {
   final pin = new TextEditingController();
 
   Timer _timer;
-  int _start = 10;
+  int _start = 300;
+  bool showResend = false;
 
   void startTimer() {
+    _start = 300;
     const oneSec = const Duration(seconds: 1);
     _timer = new Timer.periodic(
       oneSec,
@@ -31,10 +34,12 @@ class _ConfirmLoginState extends State<ConfirmLogin> {
         if (_start == 0) {
           setState(() {
             timer.cancel();
+            showResend = true;
           });
         } else {
           setState(() {
             _start--;
+            showResend = false;
           });
         }
       },
@@ -134,7 +139,7 @@ class _ConfirmLoginState extends State<ConfirmLogin> {
                             elevation: 0,
                             onPressed: () async => {
                               if (_formKey.currentState.validate())
-                                {confirmLogin(context, flowToken)}
+                                {confirmLogin(flowToken)}
                             },
                           ),
                         ),
@@ -146,7 +151,9 @@ class _ConfirmLoginState extends State<ConfirmLogin> {
                     child: FlatButton(
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
-                      onPressed: () => {Navigator.pop(context)},
+                      onPressed: () => {
+                        changeNumber()
+                      },
                       child: Directionality(
                         textDirection: TextDirection.rtl,
                         child: Text('تغییر شماره'),
@@ -156,21 +163,22 @@ class _ConfirmLoginState extends State<ConfirmLogin> {
                   Container(
                       padding: EdgeInsets.only(top: 10.0),
                       child: Text('منتظر دریافت کد فعالسازی')),
-                  Text("$_start"),
-                  Container(
-                    padding: EdgeInsets.only(top: 10.0),
-                    child: FlatButton(
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      onPressed: () => {
-                        reSendCode(context),
-                      },
-                      child: Directionality(
-                        textDirection: TextDirection.rtl,
-                        child: Text('ارسال مجدد'),
+                  Text(durationToString(_start)),
+                  if (showResend == true)
+                    Container(
+                      padding: EdgeInsets.only(top: 10.0),
+                      child: FlatButton(
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onPressed: () => {
+                          reSendCode(),
+                        },
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: Text('ارسال مجدد'),
+                        ),
                       ),
-                    ),
-                  )
+                    )
                 ],
               ),
             ),
@@ -180,7 +188,7 @@ class _ConfirmLoginState extends State<ConfirmLogin> {
     );
   }
 
-  confirmLogin(BuildContext context, String flowToken) async {
+  confirmLogin(String flowToken) async {
     var registerRes =
         await _confirmLoginRepo.getConfirmLogin(pin.text, flowToken);
     if (registerRes.Token.isNotEmpty) {
@@ -189,8 +197,23 @@ class _ConfirmLoginState extends State<ConfirmLogin> {
     }
   }
 
-  reSendCode(BuildContext context) async {
+  reSendCode() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await _registerBloc.fetchRegister(prefs.getString('mobileNo'));
+    startTimer();
+  }
+
+  changeNumber() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Navigator.of(context)
+      .pushReplacementNamed(Login.routeName, arguments: {
+      'mobileNo': prefs.getString('mobileNo'),
+    });
+  }
+
+  String durationToString(int minutes) {
+    var d = Duration(minutes: minutes);
+    List<String> parts = d.toString().split(':');
+    return '${parts[0].padLeft(2, '0')}:${parts[1].padLeft(2, '0')}';
   }
 }
