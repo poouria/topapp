@@ -10,11 +10,11 @@ ConfirmLoginModel _$ConfirmLoginModelFromJson(Map<String, dynamic> json) {
   return ConfirmLoginModel(
     json['UserId'] as String,
     json['Token'] as String,
-    json['DestinationCardNoList'] as String,
-    json['SourceCardNoList'] as String,
+    json['DestinationCardNoList'] as List,
+    json['SourceCardNoList'] as List,
     json['Info'] as String,
     json['PublicKey'] as String,
-    json['HasWallet'] as String,
+    json['HasWallet'] as bool,
     json['ResponseCoreMessage'] as String,
   );
 }

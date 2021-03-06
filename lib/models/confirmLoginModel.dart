@@ -5,11 +5,11 @@ part 'confirmLoginModel.g.dart';
 class ConfirmLoginModel {
   String UserId;
   String Token;
-  String DestinationCardNoList;
-  String SourceCardNoList;
+  List DestinationCardNoList;
+  List SourceCardNoList;
   String Info;
   String PublicKey;
-  String HasWallet;
+  bool HasWallet;
   String ResponseCoreMessage;
 
   ConfirmLoginModel(

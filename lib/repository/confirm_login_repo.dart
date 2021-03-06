@@ -15,8 +15,13 @@ class ConfirmLoginRepo {
       ),
     );
     var responseCore = ResponseCoreModel.fromJson(response);
-    var result = jsonDecode(responseCore.DataString);
-    result["ResponseCoreMessage"] = responseCore.Message;
+    var result;
+    if (responseCore.Status == 0) {
+      result = jsonDecode(responseCore.DataString);
+      result["ResponseCoreMessage"] = responseCore.Message;
+    } else {
+      print(responseCore.Status);
+    }
 
     return ConfirmLoginModel.fromJson(result);
   }
